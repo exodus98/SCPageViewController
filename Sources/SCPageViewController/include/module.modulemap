@@ -1,0 +1,4 @@
+
+module SCPageViewController {
+    header "SCPageViewController.h"
+}

@@ -31,8 +31,6 @@
 
 @interface SCPageViewController () <SCPageViewControllerViewDelegate, UIScrollViewDelegate>
 
-@property (nonatomic, assign) CGRect viewFrame; // 화면 회전이나 스플릿뷰로 화면크기가 변경될 때 탭 이동되는 현상 방지
-
 @property (nonatomic, strong) SCScrollView *scrollView;
 
 @property (nonatomic, assign) BOOL isAnimatingLayouterChange;
@@ -152,8 +150,6 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
-    self.viewFrame = self.view.frame;
     
     self.initialPageIndex = nil;
 }
@@ -784,11 +780,6 @@
 
 - (NSUInteger)_calculateCurrentPage
 {
-    // 화면 전환 중일때에 현재 페이지 계산을 잘못하는 현상을 방지
-    if( !CGRectEqualToRect(self.viewFrame, self.view.frame) && !CGRectEqualToRect(self.viewFrame, CGRectZero) ) {
-        return self.currentPage;
-    }
-    
     NSMutableArray *pages = [self.pages mutableCopy];
     for(NSUInteger i = 0; i < pages.count; i++) {
         SCPageViewControllerPageDetails *details = pages[i];
@@ -812,7 +803,7 @@
         
         NSUInteger pageIndex = [pages indexOfObject:sortedPages[i]];
         
-         CGRect frame = [self.layouter finalFrameForPageAtIndex:pageIndex pageViewController:self];
+        CGRect frame = [self.layouter finalFrameForPageAtIndex:pageIndex pageViewController:self];
         
         CGPoint centerOffset = self.scrollView.contentOffset;
         centerOffset.x += CGRectGetWidth(self.scrollView.bounds) / 2.0f;
@@ -1442,14 +1433,4 @@
     });
 }
 
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context)
-     {
-     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context)
-     {
-        // 화면전환이 완료되면 변경된 뷰 크기를 저장
-        // viewWillLayoutSubviews가 viewWillTransitionToSize보다 먼저 불려서 이렇게 처리함
-        self.viewFrame = self.view.frame;
-     }];
-}
 @end
