@@ -1,4 +1,5 @@
 
 module SCPageViewController {
     header "SCPageViewController.h"
+    export *
 }
